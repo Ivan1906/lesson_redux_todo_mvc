@@ -1,6 +1,8 @@
 import React from "react";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import {compose, withHandlers, withState} from "recompose";
+import {Provider} from 'react-redux';
+import store from './store/createStore';
 
 import {AddTodoEnhance} from "./components/AddTodo";
 import {NavBar} from "./components/NavBar";
@@ -9,40 +11,42 @@ import "./App.css";
 
 function App({onKeyDown, todos, onChange, onDelete}) {
   return (
-    <Router>
-      <div className="wrapper">
-        <div className="container">
-          <AddTodoEnhance onKeyDown={onKeyDown}/>
-          <NavBar/>
-          <Switch>
-            <Route
-              exact
-              path="/"
-              render={props => (<ListTodosEnhance
-              {...props}
-              todos={todos}
-              onChange={onChange}
-              onDelete={onDelete}/>)}/>
+    <Provider store={store}>
+      <Router>
+        <div className="wrapper">
+          <div className="container">
+            <AddTodoEnhance onKeyDown={onKeyDown}/>
+            <NavBar/>
+            <Switch>
+              <Route
+                exact
+                path="/"
+                render={props => (<ListTodosEnhance
+                {...props}
+                todos={todos}
+                onChange={onChange}
+                onDelete={onDelete}/>)}/>
 
-            <Route
-              path="/new"
-              render={props => (<ListTodosEnhance
-              {...props}
-              todos={todos}
-              onChange={onChange}
-              onDelete={onDelete}/>)}/>
+              <Route
+                path="/new"
+                render={props => (<ListTodosEnhance
+                {...props}
+                todos={todos}
+                onChange={onChange}
+                onDelete={onDelete}/>)}/>
 
-            <Route
-              path="/completed"
-              render={props => (<ListTodosEnhance
-              {...props}
-              todos={todos}
-              onChange={onChange}
-              onDelete={onDelete}/>)}/>
-          </Switch>
+              <Route
+                path="/completed"
+                render={props => (<ListTodosEnhance
+                {...props}
+                todos={todos}
+                onChange={onChange}
+                onDelete={onDelete}/>)}/>
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </Provider>
   );
 }
 
