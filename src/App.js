@@ -2,9 +2,9 @@ import React from "react";
 import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import {compose, withHandlers, withState} from "recompose";
 
-import {AddTodoEnhance} from "./comonents/AddTodo";
-import {NavBar} from "./comonents/NavBar";
-import {ListTodosEnhance} from "./comonents/ListTodos";
+import {AddTodoEnhance} from "./components/AddTodo";
+import {NavBar} from "./components/NavBar";
+import {ListTodosEnhance} from "./components/ListTodos";
 import "./App.css";
 
 function App({onKeyDown, todos, onChange, onDelete}) {
