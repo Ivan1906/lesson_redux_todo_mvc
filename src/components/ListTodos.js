@@ -1,58 +1,49 @@
-import React from "react";
-import PropTypes from "prop-types";
-import {compose, withHandlers, defaultProps, setPropTypes, mapProps} from "recompose";
+import React from 'react';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import {compose, defaultProps, setPropTypes, mapProps} from 'recompose';
 
-import {ItemTodoEnhance} from "./ItemTodo";
+import {todosSelectors} from '../modules/todos';
+import {ItemTodoEnhance} from './ItemTodo';
 
-function ListTodos({match, todos, onChange, onDelete}) {
+function ListTodos({todos}) {
   return (
     <React.Fragment>
       {todos.map(todo => {
-        return (<ItemTodoEnhance
-          key={todo.id}
-          todo={todo}
-          onChange={onChange}
-          onDelete={onDelete}/>);
+        return <ItemTodoEnhance key={todo.id} todo={todo}/>;
       })}
     </React.Fragment>
   );
 }
 
-const enhance = compose(setPropTypes({
-  todos: PropTypes
-    .arrayOf(PropTypes.shape({
-    id: PropTypes.number.isRequired,
+const mapStateToProps = state => ({
+  todos: todosSelectors.getTodos(state)
+});
+
+const mapDispatchToProps = {};
+
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps,), setPropTypes({
+  todos: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
     type: PropTypes
-      .oneOf(["new", "completed"])
+      .oneOf(['new', 'completed'])
       .isRequired
-  }))
-    .isRequired,
-  onChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
-}), defaultProps({
-  todos: [],
-  onChange: () => console.log("Missing parameter onChange!"),
-  onDelete: () => console.log("Missing parameter onDelete!")
-}), mapProps(props => {
+  }),).isRequired
+}), defaultProps({todos: []}), mapProps(props => {
   let {todos, match} = props;
-  let type = match
-    .path
-    .substring(1);
-  todos = todos.filter(todo => match.path === "/" || todo.type === type
-    ? todo
-    : null);
-  return {
-    ...props,
-    todos
-  };
-}), withHandlers({
-  onChange: props => event => {
-    props.onChange(event);
-  },
-  onDelete: props => event => {
-    props.onDelete(event);
+  if (match.path !== '/') {
+    todos = todos.filter(todo => (todo.type === match.path.slice(1)
+      ? todo
+      : null));
+
+    return {
+      ...props,
+      todos
+    };
   }
-}));
+
+  return props;
+}),);
 
 export const ListTodosEnhance = enhance(ListTodos);

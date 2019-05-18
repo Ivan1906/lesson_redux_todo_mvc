@@ -1,54 +1,63 @@
-import React from "react";
-import {compose, withHandlers, defaultProps, setPropTypes, lifecycle} from "recompose";
-import PropTypes from "prop-types";
+import React from 'react';
+import {compose, withHandlers, defaultProps, setPropTypes, lifecycle} from 'recompose';
+import {connect} from 'react-redux';
+import PropTypes from 'prop-types';
+import * as todosOperations from '../modules/todos/todosOperations';
 
-function ItemTodo({todo, onChange, onDelete}) {
+function ItemTodo({todo, handlerChangeTypeTodo, handlerRemoveTodo}) {
   return (
     <div className="todo" id={todo.id}>
       <input
         type="checkbox"
-        onClick={onChange}
-        defaultChecked={todo.type === "completed"
+        onClick={handlerChangeTypeTodo}
+        defaultChecked={todo.type === 'completed'
         ? true
         : false}/>
 
       <span>{todo.text}</span>
-      <button onClick={onDelete}>Delete</button>
+      <button onClick={handlerRemoveTodo}>Delete</button>
     </div>
   );
 }
 
-const enhance = compose(setPropTypes({
+const mapStateToProps = state => ({todos: state.todos.todos});
+
+const mapDispatchToProps = {
+  changeTypeTodo: todosOperations.actions.changeTypeTodo,
+  removeTodo: todosOperations.actions.removeTodo
+};
+
+const enhance = compose(connect(mapStateToProps, mapDispatchToProps,), setPropTypes({
   todo: PropTypes
     .shape({
-    id: PropTypes.number.isRequired,
+    id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
     type: PropTypes
-      .oneOf(["new", "completed"])
+      .oneOf(['new', 'completed'])
       .isRequired
   })
     .isRequired,
-  onChange: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
+  handlerChangeTypeTodo: PropTypes.func.isRequired,
+  handlerRemoveTodo: PropTypes.func.isRequired
 }), defaultProps({
   todo: {
-    id: 0,
-    text: "No todo element",
-    type: "new"
+    id: 'todoId',
+    text: 'No todo element',
+    type: 'new'
   },
-  onChange: () => console.log("Missing parameter onChange!"),
-  onDelete: () => console.log("Missing parameter onDelete!")
+  handlerChangeTypeTodo: () => console.log('Missing method handlerChangeTypeTodo!'),
+  handlerRemoveTodo: () => console.log('Missing method handlerRemoveTodo!')
 }), lifecycle({
   shouldComponentUpdate(nextProps) {
     return this.props.todo.type !== nextProps.todo.type;
   }
 }), withHandlers({
-  onChange: props => event => {
-    props.onChange(event);
+  handlerChangeTypeTodo: props => event => {
+    props.changeTypeTodo(event.currentTarget.parentElement.getAttribute('id'));
   },
-  onDelete: props => event => {
-    props.onDelete(event);
+  handlerRemoveTodo: props => event => {
+    props.removeTodo(event.currentTarget.parentElement.getAttribute('id'));
   }
-}));
+}),);
 
 export const ItemTodoEnhance = enhance(ItemTodo);
