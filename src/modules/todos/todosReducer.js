@@ -1,5 +1,12 @@
-const initialState = {};
+import {handleActions} from 'redux-actions';
+import * as actions from './todosActions';
 
-export default function reducer(state = initialState, action) {
-  return state;
+const initialState = {
+  todos: []
 };
+
+export default handleActions({
+  [actions.addTodo]: (state, action) => ({
+    todos: state.todos.concat(action.payload)
+  }),
+}, initialState);
