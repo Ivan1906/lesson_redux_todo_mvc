@@ -1,33 +1,65 @@
-import {handleActions} from 'redux-actions';
+import { handleActions } from '@letapp/redux-actions';
 import * as actions from './todosActions';
 
 const initialState = {
-  todos: []
+  todos: [],
+  isLoading: false,
+  isError: false,
 };
 
-export default handleActions({
-  [actions.addTodo]: (state, action) => ({
-    todos: state
-      .todos
-      .concat(action.payload)
-  }),
-  [actions.removeTodo]: (state, action) => ({
-    todos: state
-      .todos
-      .filter(todo => (todo.id !== action.payload
-        ? todo
-        : null))
-  }),
-  [actions.changeTypeTodo]: (state, action) => ({
-    todos: state
-      .todos
-      .map(todo => todo = todo.id === action.payload
-        ? {
-          ...todo,
-          type: todo.type === 'new'
-            ? 'completed'
-            : 'new'
-        }
-        : todo)
-  })
-}, initialState,);
+export default handleActions(
+  {
+    [actions.addTodo.start]: state => ({
+      ...state,
+      isLoading: true,
+    }),
+    [actions.addTodo.success]: (state, action) => ({
+      ...state,
+      isLoading: false,
+      todos: state.todos.concat(action.payload),
+    }),
+    [actions.addTodo.error]: state => ({
+      ...state,
+      isLoading: false,
+      isError: true,
+    }),
+    [actions.removeTodo.start]: state => ({
+      ...state,
+      isLoading: true,
+    }),
+    [actions.removeTodo.success]: (state, action) => ({
+      ...state,
+      isLoading: false,
+      todos: state.todos.filter(todo => (todo.id !== action.payload ? todo : null)),
+    }),
+    [actions.removeTodo.error]: (state, action) => ({
+      ...state,
+      isLoading: false,
+      isError: true,
+    }),
+    [actions.changeTypeTodo.start]: state => ({
+      ...state,
+      isLoading: true,
+    }),
+    [actions.changeTypeTodo.success]: (state, action) => ({
+      ...state,
+      isLoading: false,
+      todos: state.todos.map(
+        todo =>
+          (todo =
+            todo.id === action.payload
+              ? {
+                  ...todo,
+                  type: todo.type === 'new' ? 'completed' : 'new',
+                }
+              : todo),
+      ),
+    }),
+    [actions.changeTypeTodo.error]: state => ({
+      ...state,
+      isLoading: false,
+      isError: true,
+    }),
+  },
+  initialState,
+);
