@@ -10,7 +10,7 @@ function ItemTodo({ todo, handlerChangeTypeTodo, handlerRemoveTodo }) {
       <input
         type="checkbox"
         onClick={handlerChangeTypeTodo}
-        defaultChecked={todo.type === 'completed' ? true : false}
+        checked={todo.type === 'completed' ? true : false}
       />
       <span>{todo.text}</span>
       <button onClick={handlerRemoveTodo}>Delete</button>

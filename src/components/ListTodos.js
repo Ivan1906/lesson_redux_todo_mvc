@@ -6,13 +6,14 @@ import { compose, defaultProps, setPropTypes } from 'recompose';
 import { todosSelectors } from '../modules/todos';
 import { ItemTodoEnhance } from './ItemTodo';
 
-function ListTodos({ todos, isLoading }) {
+function ListTodos({ todos, isLoading, isError, messageError }) {
   return (
     <React.Fragment>
       {todos.map(todo => {
         return <ItemTodoEnhance key={todo.id} todo={todo} />;
       })}
       {isLoading ? <div>Please wait "Processing data"!</div> : null}
+      {isError ? <div>Error: {messageError}</div> : null}
     </React.Fragment>
   );
 }
@@ -20,6 +21,8 @@ function ListTodos({ todos, isLoading }) {
 const mapStateToProps = (state, props) => ({
   todos: todosSelectors.getTodosByType(props.match.path.slice(1))(state),
   isLoading: todosSelectors.getLoading(state),
+  isError: todosSelectors.getError(state),
+  messageError: todosSelectors.getMessageError(state),
 });
 
 const enhance = compose(

@@ -1,47 +1,34 @@
-import uuid from 'uuid/v4';
+import fetchData from './Backend';
 
-const ERROR_MESSAGE = {
-    ADD_TODO: 'Виникла помилка при добавлені todo',
-    CHANGE_TYPE_TODO: 'Виникла помилка при зміні типу todo',
-    DELETE_TODO: 'Виникла помилка при видалені todo'
-}
+const TodoApi = {
+  add(body) {
+    return fetchData('todos', {
+      method: 'post',
+      body,
+    });
+  },
 
-export const Todos = {
-    _todos: [],
+  remove(id) {
+    return fetchData(`todos/${id}`, { method: 'delete' });
+  },
 
-    get Todos() {
-        return this._todos;
-    },
+  removeMany(ids) {
+    return fetchData('todos/remove', {
+      method: 'post',
+      body: ids,
+    });
+  },
 
-    addTodo(todo) {
-        return new Promise((resolve, reject) => {
-            let timeout = 1 + Math.round().toFixed(1)*10;
-            
-            setTimeout(() => {
-                if (Boolean(+Math.random().toFixed())) {
-                    todo.id = uuid();
-                    this._todos.push();
-                    resolve(todo);
-                } else {
-                    reject(new Error(ERROR_MESSAGE.ADD_TODO))
-                }
-            }, timeout);
-        })
-    },
+  getAll() {
+    return fetchData('todos');
+  },
 
-    deleteTodo(id) {
-        return new Promise((resolve, reject) => {
-            let timeout = 1 + Math.round().toFixed(1)*10;
-            
-            setTimeout(() => {
-                if (Boolean(+Math.random().toFixed())) {
-                    todo.id = uuid();
-                    this._todos.push();
-                    resolve(todo);
-                } else {
-                    reject(new Error(ERROR_MESSAGE.ADD_TODO))
-                }
-            }, timeout);
-        })
-    },
-}
+  update(id, body) {
+    return fetchData(`todos/${id}`, {
+      method: 'patch',
+      body,
+    });
+  },
+};
+
+export default TodoApi;

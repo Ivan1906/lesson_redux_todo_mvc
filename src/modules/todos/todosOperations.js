@@ -1,55 +1,50 @@
 import * as actions from './todosActions';
+import Api from '../../api';
 
 export function addTodo(todo) {
   return async function addTodoThunk(dispatch, getState) {
     try {
-      dispatch(actions.addTodo.start());
+      dispatch(actions.addTodo.start(todo));
 
-      await new Promise(resolve => {
-        setTimeout(() => {
-          resolve();
-        }, 2000);
-      });
+      let newTodo = await Api.add(todo);
 
-      dispatch(actions.addTodo.success(todo));
-    } catch (err) {
-      dispatch(actions.addTodo.error());
+      dispatch(actions.addTodo.success({ todo: newTodo, id: todo.id }));
+    } catch (error) {
+      dispatch(actions.addTodo.error({ error, id: todo.id }));
     }
   };
 }
 
 export function removeTodo(id) {
   return async function removeTodoThunk(dispatch, getState) {
+    let { todos } = getState().todos;
     try {
-      dispatch(actions.removeTodo.start());
+      dispatch(actions.removeTodo.start(id));
 
-      await new Promise(resolve => {
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
+      await Api.remove(id);
 
-      dispatch(actions.removeTodo.success(id));
-    } catch (err) {
-      dispatch(actions.removeTodo.error());
+      dispatch(actions.removeTodo.success());
+    } catch (error) {
+      let todo = todos.find(todo => todo.id === id);
+      dispatch(actions.removeTodo.error({ error, todo }));
     }
   };
 }
 
 export function changeTypeTodo(id) {
   return async function changeTypeTodoThunk(dispatch, getState) {
+    let { todos } = getState().todos;
+    let todo = todos.find(todo => todo.id === id);
     try {
-      dispatch(actions.changeTypeTodo.start());
+      await dispatch(actions.changeTypeTodo.start(id));
 
-      await new Promise(resolve => {
-        setTimeout(() => {
-          resolve();
-        }, 1000);
-      });
+      todo.type = todo.type === 'new' ? 'completed' : 'new';
 
-      dispatch(actions.changeTypeTodo.success(id));
-    } catch (err) {
-      dispatch(actions.changeTypeTodo.error());
+      let newTodo = await Api.update(id, todo);
+
+      dispatch(actions.changeTypeTodo.success({ newTodo }));
+    } catch (error) {
+      dispatch(actions.changeTypeTodo.error({ error, id }));
     }
   };
 }
